@@ -1,4 +1,4 @@
-package fun.icystal.core;
+package fun.icystal.core.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;

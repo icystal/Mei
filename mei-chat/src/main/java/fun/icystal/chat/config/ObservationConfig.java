@@ -1,6 +1,6 @@
 package fun.icystal.chat.config;
 
-import fun.icystal.core.JsonUtil;
+import fun.icystal.core.util.JsonUtil;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;

@@ -3,6 +3,7 @@ package fun.icystal.chat.controller;
 import com.alibaba.cloud.ai.memory.redis.RedissonRedisChatMemoryRepository;
 import fun.icystal.chat.wrapper.CallRequest;
 import fun.icystal.chat.wrapper.MeiResponse;
+import fun.icystal.core.context.UserHolder;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -10,6 +11,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
@@ -41,7 +43,7 @@ public class ChatController {
     public MeiResponse<?> call(@RequestBody CallRequest request) {
         String content = chatClient.prompt(request.getQuery())
                 .advisors(
-                        a -> a.param(CONVERSATION_ID, request.getConversationId())
+                        a -> a.param(CONVERSATION_ID, Objects.requireNonNull(UserHolder.getConversationId()))
                 )
                 .call()
                 .content();
