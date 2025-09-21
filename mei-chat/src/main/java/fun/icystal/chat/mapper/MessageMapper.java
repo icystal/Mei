@@ -17,7 +17,7 @@ public interface MessageMapper {
     @Insert("INSERT INTO message(conversation_id, content, type, time) VALUES(#{conversationId}, #{content}, #{type}, #{time})")
     int insert(MessageLog message);
 
-    @Select("SELECT * FROM message WHERE conversation_id = #{conversationId}")
-    List<MessageLog> selectByConversationId(String conversationId);
+    @Select("SELECT * FROM message WHERE conversation_id = #{conversationId} ORDER BY time DESC LIMIT #{limit}")
+    List<MessageLog> selectByConversationId(String conversationId, int limit);
 
 }
