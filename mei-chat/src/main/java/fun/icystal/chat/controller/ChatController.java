@@ -1,6 +1,10 @@
 package fun.icystal.chat.controller;
 
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
+import com.alibaba.cloud.ai.memory.jdbc.MysqlChatMemoryRepository;
 import com.alibaba.cloud.ai.memory.redis.RedissonRedisChatMemoryRepository;
+import fun.icystal.chat.advisor.RecordAdvisor;
+import fun.icystal.chat.prompt.SystemPromptBuilder;
 import fun.icystal.chat.wrapper.CallRequest;
 import fun.icystal.chat.wrapper.MeiResponse;
 import fun.icystal.core.context.UserHolder;
@@ -19,13 +23,15 @@ import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 @RequestMapping("/chat")
 public class ChatController {
 
-    private final int MAX_MESSAGES = 100;
+    private static final int MAX_MESSAGES = 5;
 
     private final ChatClient chatClient;
 
     private final MessageWindowChatMemory messageWindowChatMemory;
 
-    public ChatController(ChatClient.Builder builder, RedissonRedisChatMemoryRepository redisChatMemoryRepository) {
+    private final SystemPromptBuilder systemPromptBuilder;
+
+    public ChatController(ChatClient.Builder builder, RedissonRedisChatMemoryRepository redisChatMemoryRepository, SystemPromptBuilder systemPromptBuilder, RecordAdvisor recordAdvisor) {
         this.messageWindowChatMemory = MessageWindowChatMemory.builder()
                 .chatMemoryRepository(redisChatMemoryRepository)
                 .maxMessages(MAX_MESSAGES)
@@ -34,24 +40,35 @@ public class ChatController {
         this.chatClient = builder
                 .defaultAdvisors(
                         MessageChatMemoryAdvisor.builder(messageWindowChatMemory)
-                                .build()
+                                .build(),
+                        recordAdvisor
                 )
                 .build();
+
+        this.systemPromptBuilder = systemPromptBuilder;
     }
 
     @PostMapping("/call")
     public MeiResponse<?> call(@RequestBody CallRequest request) {
-        String content = chatClient.prompt(request.getQuery())
+        String content = chatClient
+                .prompt()
+                .system(systemPromptBuilder.systemPrompt())
+                .user(request.getQuery())
                 .advisors(
                         a -> a.param(CONVERSATION_ID, Objects.requireNonNull(UserHolder.getConversationId()))
                 )
+                .options(DashScopeChatOptions.builder()
+                        .withTemperature(0.55)
+                        .build())
                 .call()
                 .content();
         return MeiResponse.success(content);
     }
 
-    @GetMapping("/history/{conversation_id}")
-    public List<Message> history(@PathVariable("conversation_id") String conversationId) {
+    @GetMapping("/history")
+    public List<Message> history() {
+        String conversationId = UserHolder.getConversationId();
+        assert conversationId != null;
         return messageWindowChatMemory.get(conversationId);
     }
 

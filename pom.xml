@@ -30,6 +30,9 @@
         <spring-ai.version>1.0.1</spring-ai.version>
         <!-- Spring AI Alibaba -->
         <spring-ai-alibaba.version>1.0.0.3</spring-ai-alibaba.version>
+
+        <mysql.version>8.0.32</mysql.version>
+        <mybatis.version>3.0.5</mybatis.version>
     </properties>
 
     <dependencyManagement>
@@ -71,6 +74,20 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.18.0</version>
             </dependency>
+
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>

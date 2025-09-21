@@ -17,7 +17,7 @@ import java.util.UUID;
 public class UserInterceptor implements HandlerInterceptor {
     private static final String HEADER_USER_ID = "X-User-Id";
     private static final String HEADER_USER_TOKEN = "X-User-Token";
-    private static final String HEADER_CONVERSATION_ID = "X-CONVERSATION-ID";
+    private static final String HEADER_CONVERSATION_ID = "X-Conversation-Id";
 
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {

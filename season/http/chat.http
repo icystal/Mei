@@ -2,16 +2,17 @@ POST http://localhost:7717/chat/call
 Content-Type: application/json
 X-User-Id: test
 X-User-Token: test
-X-CONVERSATION-ID: test_0
+X-Conversation-Id: test_9
 
 {
-  "query": "你好，很高兴认识你，能简单介绍一下自己吗？"
+  "query": ""
 }
 
 ###
-GET http://localhost:7717/chat/history/test_0
+GET http://localhost:7717/chat/history
 Accept: application/json
 X-User-Id: test
 X-User-Token: test
+X-Conversation-Id: test_9
 
 
