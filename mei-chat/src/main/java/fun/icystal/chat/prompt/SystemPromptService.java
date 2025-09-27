@@ -2,6 +2,7 @@ package fun.icystal.chat.prompt;
 
 import fun.icystal.chat.prompt.handler.SystemPromptHandler;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class SystemPromptService {
     @Value("${prompt.system.exhort}")
     private String systemExhort;
 
-    public String prompt() {
+    public SystemMessage prompt() {
 
         StringBuilder sb = new StringBuilder();
         sb.append(systemTitle).append("\n");
@@ -31,7 +32,8 @@ public class SystemPromptService {
         }
 
         sb.append(systemExhort).append("\n");
-        return sb.toString();
+
+        return new SystemMessage(sb.toString());
     }
 
 

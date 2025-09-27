@@ -1,9 +1,13 @@
 package fun.icystal.chat.advisor;
 
 import fun.icystal.chat.mapper.MessageMapper;
+import fun.icystal.chat.mapper.SummaryMapper;
 import fun.icystal.chat.prompt.SystemPromptService;
 import fun.icystal.chat.util.BeanMapper;
 import fun.icystal.core.entity.MessageLog;
+import fun.icystal.core.entity.Summary;
+import fun.icystal.core.util.JsonUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.chat.client.ChatClientRequest;
@@ -12,12 +16,12 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.ai.chat.messages.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 多层记忆的实现
@@ -26,31 +30,32 @@ import java.util.Objects;
  * 从历史对话的数据库中查询 k 条历史 作为 长期记忆
  */
 @Component
+@Slf4j
 public final class MultilayerMemoryAdvisor implements BaseChatMemoryAdvisor {
 
-    /**
-     * 短期记忆轮次
-     */
-    private final int shortTerm = 10;
+    private final SummaryMapper summaryMapper;
 
     /**
-     * 摘要范围
+     * 最大短期对话数量
      */
-    private final int summaryScope = 10;
+    @Value("${memory.term.short.max}")
+    private int maxShortTerm;
 
     /**
      * 长期记忆条数
      */
-    private final int longTerm = 5;
+    @Value("${memory.term.long}")
+    private int longTerm = 5;
 
     private final MessageMapper messageMapper;
 
     private final SystemPromptService systemPromptService;
 
-    private MultilayerMemoryAdvisor(MessageMapper messageMapper, SystemPromptService systemPromptService) {
 
+    private MultilayerMemoryAdvisor(MessageMapper messageMapper, SystemPromptService systemPromptService, SummaryMapper summaryMapper) {
         this.messageMapper = messageMapper;
         this.systemPromptService = systemPromptService;
+        this.summaryMapper = summaryMapper;
     }
 
     @NotNull
@@ -65,7 +70,7 @@ public final class MultilayerMemoryAdvisor implements BaseChatMemoryAdvisor {
                 .filter(message -> MessageType.SYSTEM.equals(message.getMessageType()))
                 .map(message -> (SystemMessage) message)
                 .filter(message -> StringUtils.isNotBlank(message.getText()))
-                .toList();
+                .collect(Collectors.toList());
 
         List<UserMessage> userMessages = instructions.stream()
                 .filter(message -> MessageType.USER.equals(message.getMessageType()))
@@ -77,29 +82,40 @@ public final class MultilayerMemoryAdvisor implements BaseChatMemoryAdvisor {
                 .filter(message -> MessageType.TOOL.equals(message.getMessageType()))
                 .toList();
 
-        StringBuilder systemPrompt = new StringBuilder();
-        if (!CollectionUtils.isEmpty(systemMessages)) {
-            for (SystemMessage systemMessage : systemMessages) {
-                systemPrompt.append(systemMessage.getText()).append("\n");
-            }
-        }
+        SystemMessage systemMessage = systemPromptService.prompt();
+        systemMessages.add(systemMessage);
 
-        systemPrompt.append(systemPromptService.prompt());
-
-        SystemMessage systemMessage = new SystemMessage(systemPrompt.toString());
-
-        List<MessageLog> messageLogs = messageMapper.selectByConversationId(conversationId, shortTerm);
+        // 查询历史消息, 并过滤出还没有生成摘要的消息. 对于超出限制的消息, 生成摘要, 并移除队列
+        List<MessageLog> messageLogs = messageMapper.selectByConversationId(conversationId, maxShortTerm);
+        log.debug("查询到历史消息: {}", JsonUtil.toJSONString(messageLogs));
         if (CollectionUtils.isEmpty(messageLogs)) {
             messageLogs = List.of();
         }
 
+        messageLogs.sort(Comparator.comparing(MessageLog::time));
+
+        Set<Long> summaryIds = new HashSet<>();
+        for (MessageLog messageLog : messageLogs) {
+            if (messageLog.summaryId() == null || !summaryIds.add(messageLog.summaryId())) {
+                continue;
+            }
+
+            Summary summary = summaryMapper.selectBySummaryId(messageLog.summaryId());
+            if (summary != null && StringUtils.isNotBlank(summary.content())) {
+                String messagePrompt = "[对话摘要] " + summary.content();
+                systemMessages.add(new SystemMessage(messagePrompt));
+            }
+        }
+
+
         List<Message> shortMemory = messageLogs.stream()
+                .filter(messageLog -> Objects.isNull(messageLog.summaryId()))
                 .map(BeanMapper::convertMessage)
                 .filter(Objects::nonNull)
                 .toList();
 
         List<Message> messages = new ArrayList<>();
-        messages.add(systemMessage);
+        messages.addAll(systemMessages);
         messages.addAll(shortMemory);
         messages.addAll(userMessages);
         messages.addAll(toolMessages);
