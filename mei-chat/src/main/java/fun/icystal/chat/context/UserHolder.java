@@ -1,7 +1,7 @@
-package fun.icystal.core.context;
+package fun.icystal.chat.context;
 
 import com.alibaba.ttl.TransmittableThreadLocal;
-import fun.icystal.core.entity.UserInfo;
+import fun.icystal.chat.entity.UserInfo;
 
 
 public class UserHolder {

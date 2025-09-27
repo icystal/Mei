@@ -2,9 +2,9 @@ package fun.icystal.chat.advisor;
 
 import fun.icystal.chat.mapper.MessageMapper;
 import fun.icystal.chat.service.SummaryService;
-import fun.icystal.core.entity.MessageLog;
-import fun.icystal.core.util.JsonUtil;
-import fun.icystal.core.util.SnowFlake;
+import fun.icystal.chat.entity.MessageLog;
+import fun.icystal.chat.util.JsonUtil;
+import fun.icystal.chat.util.SnowFlake;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static fun.icystal.core.context.UserHolder.getConversationId;
+import static fun.icystal.chat.context.UserHolder.getConversationId;
 
 /**
  * 使用 mysql 记录消息

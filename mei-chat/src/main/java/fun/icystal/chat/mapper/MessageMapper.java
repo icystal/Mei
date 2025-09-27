@@ -1,6 +1,6 @@
 package fun.icystal.chat.mapper;
 
-import fun.icystal.core.entity.MessageLog;
+import fun.icystal.chat.entity.MessageLog;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

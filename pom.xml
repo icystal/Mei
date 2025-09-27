@@ -18,7 +18,6 @@
 
     <modules>
         <module>mei-chat</module>
-        <module>mei-core</module>
     </modules>
 
     <properties>

@@ -1,6 +1,6 @@
 package fun.icystal.chat.util;
 
-import fun.icystal.core.entity.MessageLog;
+import fun.icystal.chat.entity.MessageLog;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.messages.*;
 

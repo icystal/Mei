@@ -1,7 +1,7 @@
 package fun.icystal.chat.interceptor;
 
-import fun.icystal.core.context.UserHolder;
-import fun.icystal.core.entity.UserInfo;
+import fun.icystal.chat.context.UserHolder;
+import fun.icystal.chat.entity.UserInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

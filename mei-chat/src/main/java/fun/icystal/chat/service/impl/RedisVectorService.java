@@ -1,12 +1,10 @@
 package fun.icystal.chat.service.impl;
 
 import fun.icystal.chat.service.VectorService;
-import fun.icystal.core.context.UserHolder;
-import fun.icystal.core.entity.UserInfo;
+import fun.icystal.chat.context.UserHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

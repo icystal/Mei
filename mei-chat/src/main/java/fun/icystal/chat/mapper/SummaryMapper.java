@@ -1,6 +1,6 @@
 package fun.icystal.chat.mapper;
 
-import fun.icystal.core.entity.Summary;
+import fun.icystal.chat.entity.Summary;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

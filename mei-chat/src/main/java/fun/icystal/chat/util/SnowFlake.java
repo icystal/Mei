@@ -1,4 +1,4 @@
-package fun.icystal.core.util;
+package fun.icystal.chat.util;
 
 public class SnowFlake {
     // 基准时间戳

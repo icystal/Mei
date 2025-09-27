@@ -1,4 +1,4 @@
-package fun.icystal.core.entity;
+package fun.icystal.chat.entity;
 
 import java.time.LocalDateTime;
 

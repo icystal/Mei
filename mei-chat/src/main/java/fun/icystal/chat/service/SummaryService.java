@@ -2,12 +2,12 @@ package fun.icystal.chat.service;
 
 import fun.icystal.chat.mapper.MessageMapper;
 import fun.icystal.chat.mapper.SummaryMapper;
-import fun.icystal.core.context.UserHolder;
-import fun.icystal.core.dto.MessageSummaryDTO;
-import fun.icystal.core.entity.MessageLog;
-import fun.icystal.core.entity.Summary;
-import fun.icystal.core.util.JsonUtil;
-import fun.icystal.core.util.SnowFlake;
+import fun.icystal.chat.context.UserHolder;
+import fun.icystal.chat.dto.MessageSummaryDTO;
+import fun.icystal.chat.entity.MessageLog;
+import fun.icystal.chat.entity.Summary;
+import fun.icystal.chat.util.JsonUtil;
+import fun.icystal.chat.util.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.ChatClient;

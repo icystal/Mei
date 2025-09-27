@@ -1,4 +1,4 @@
-package fun.icystal.core.dto;
+package fun.icystal.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
